@@ -21,7 +21,7 @@ public class Main {
         String filmFilePath = "films.txt";
 
         //String commandsFilePath = args[2];
-        String commandsFilePath = "Commands.txt";
+        String commandsFilePath = "commands.txt";
 
         //String outputFilePath = args[3];
         String outputFilePath = "output.txt";
