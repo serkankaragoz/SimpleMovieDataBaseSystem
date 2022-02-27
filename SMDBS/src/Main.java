@@ -14,17 +14,17 @@ public class Main {
 
         // names of files which will be used
 
-        String peopleFilePath = args[0];
-        //String peopleFilePath = "people.txt";
+        //String peopleFilePath = args[0];
+        String peopleFilePath = "people.txt";
 
-        String filmFilePath = args[1];
-        //String filmFilePath = "films.txt";
+        //String filmFilePath = args[1];
+        String filmFilePath = "films.txt";
 
-        String commandsFilePath = args[2];
-        //String commandsFilePath = "Commands.txt";
+        //String commandsFilePath = args[2];
+        String commandsFilePath = "Commands.txt";
 
-        String outputFilePath = args[3];
-        //String outputFilePath = "output.txt";
+        //String outputFilePath = args[3];
+        String outputFilePath = "output.txt";
 
 
         ArrayList<ArrayList<String>> peopleStringArray = commands.convertFileToStringArray(peopleFilePath);
