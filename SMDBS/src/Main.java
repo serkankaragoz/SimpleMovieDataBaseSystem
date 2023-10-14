@@ -187,11 +187,11 @@ public class Main {
 
             }
             else if(commandLine.get(0).equals("LIST") && commandLine.get(1).equals("USER") && commandLine.get(3).equals("RATES")){
-                int userID = Integer.valueOf(commandLine.get(2));
+                int userID = Integer.parseInt(commandLine.get(2));
 
                 if(commands.getPersonFromId(userID,personArray).getClass() == User.class){
 
-                    User user = (User)commands.getPersonFromId(userID,personArray);
+                    User user = (User) commands.getPersonFromId(userID,personArray);
                     if(user.getRatedFilms().size() != 0){
                         for(Integer ratedFilmID: user.getRatedFilms().keySet()){
                             Film film = commands.getFilmFromId(ratedFilmID, filmArray);
@@ -211,15 +211,15 @@ public class Main {
             }
 
             else if(commandLine.get(0).equals("EDIT") && commandLine.get(1).equals("RATE")){
-                int userID = Integer.valueOf(commandLine.get(2));
-                int filmID = Integer.valueOf(commandLine.get(3));
-                int newRatingPoint = Integer.valueOf(commandLine.get(4));
+                int userID = Integer.parseInt(commandLine.get(2));
+                int filmID = Integer.parseInt(commandLine.get(3));
+                int newRatingPoint = Integer.parseInt(commandLine.get(4));
 
-                Person person = commands.getPersonFromId(userID,personArray);
+                User user = (User) commands.getPersonFromId(userID,personArray);
                 Film film = commands.getFilmFromId(filmID,filmArray);
 
-                if(person != null && film != null && ((User)person).getRatedFilms().get(filmID) != null){
-                    ((User)person).editRating(filmID,newRatingPoint);
+                if(user != null && film != null && user.getRatedFilms().get(filmID) != null){
+                    user.editRating(filmID,newRatingPoint);
                     film.editRating(userID,newRatingPoint);
                     bw.write("New ratings done successfully\n");
                     bw.write("Film title: " + film.getFilmTitle() + "\n");
@@ -229,27 +229,24 @@ public class Main {
                     bw.write("Command Failed\n");
                     bw.write("User ID: " + userID);
                     bw.write("\nFilm ID: " + filmID + "\n");
-
-
                 }
-
             }
 
             else if(commandLine.get(0).equals("REMOVE") && commandLine.get(1).equals("RATE")){
                 int userID = Integer.parseInt(commandLine.get(2));
                 int filmID = Integer.parseInt(commandLine.get(3));
 
-                Person person = commands.getPersonFromId(userID,personArray);
+                User user = (User) commands.getPersonFromId(userID,personArray);
                 Film film = commands.getFilmFromId(filmID,filmArray);
 
-                if(person != null && film != null && ((User)person).getRatedFilms().get(filmID) != null){
-                    ((User)person).removeRating(filmID);
+                if(user != null && film != null && user.getRatedFilms().get(filmID) != null){
+                    user.removeRating(filmID);
                     film.removeRating(userID);
                     bw.write("Your film rating was removed successfully\nFilm title: " + film.getFilmTitle() + "\n");
                 }
                 else{
                     bw.write("Command Failed\n");
-                    bw.write("User ID: " + person.getID() + "\n");
+                    bw.write("User ID: " + user.getID() + "\n");
                     bw.write("Film ID: " + film.getFilmID() + "\n");
                 }
 

@@ -316,9 +316,11 @@ public class Commands {
 
         for(Film film: films){
 
-            featureFilmDatas.append("Film title: " + film.getFilmTitle() + " " + film.getDate() + "\n");
-            featureFilmDatas.append(film.getRunTime() + " min\n");
-            featureFilmDatas.append("Language: " + film.getLanguage() + "\n");
+            featureFilmDatas.append(
+                    "Film title: " + film.getFilmTitle() + " " + film.getDate() + "\n"
+                    + film.getRunTime() + " min\n"
+                    + "Language: " + film.getLanguage() + "\n"
+            );
             count++;
             if(count < films.size()){
                 featureFilmDatas.append("\n");
