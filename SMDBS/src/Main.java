@@ -369,20 +369,17 @@ public class Main {
 
                 for(Film film: sampleFilms){
 
-                    ArrayList<Film> unSortedFilms = commands.extractFilm(film,filmArray);
+                    ArrayList<Film> films = commands.extractFilm(film,filmArray);
 
-
-                    ArrayList<Film> films = commands.sortByRateDegree(unSortedFilms);
+                    films.sort(Commands.rateDegreeComparator);
 
                     //bw.write("\n");
-                    if(film.getClass() == FeatureFilm.class){ bw.write("FeatureFilm:\n");}
-                    else if(film.getClass() == ShortFilm.class){ bw.write("ShortFilm:\n");}
-                    else if(film.getClass() == Documentary.class){ bw.write("Documentary:\n");}
-                    else if(film.getClass() == TvSeries.class){ bw.write("TvSeries:\n");}
+
+                    System.out.println(film.getClass().getName() + ":\n");
+
                     for(Film film1: films){
                         bw.write( film1.getFilmTitle() + " " + film1.getDate());
                         bw.write(" Ratings: " + film1.printRating() + "/10 from " + film1.getRatings().size() +" users\n");
-
                     }
                     i++;
                     if(i < sampleFilms.size()){

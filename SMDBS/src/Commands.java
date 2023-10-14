@@ -265,39 +265,13 @@ public class Commands {
         return true;
     }
 
-    // Sorts the Film ArrayList with comparing their rating, to descending order
-    public ArrayList<Film> sortByRateDegree(ArrayList<Film> films){
 
-        ArrayList<Film> newFilms = new ArrayList<>();
-        ArrayList<Integer> filmIDs = new ArrayList<>();
-
-
-        int index = 0;
-
-        while(1 == 1){
-            Float maxRating = 0f;
-            int maxIndex = 0;
-
-            if(films.size() == 0){
-                break;
-            }
-            for(int i= 0; i < films.size();i++){
-
-                if(films.get(i).getRatingPoint() > maxRating){
-                    maxRating = films.get(i).getRatingPoint();
-                    maxIndex = i;
-
-                }
-            }
-
-            Film film = films.get(maxIndex);
-            films.remove(maxIndex);
-            newFilms.add(film);
-
+    public static Comparator<Film> rateDegreeComparator = new Comparator<Film>() {
+        @Override
+        public int compare(Film o1, Film o2) {
+            return - Float.compare(o1.getRatingPoint(), o2.getRatingPoint());
         }
-
-        return newFilms;
-    }
+    };
 
 
     // Takes a Film ArrayList and returns another Film ArrayList which only contains the films that on specified class
