@@ -232,12 +232,6 @@ public class Commands {
     }
 
 
-    // adds the rating to film and user
-    public void addRating(User user, Film film, Integer ratingPoint){
-        user.rateFilm(film.getFilmID(),ratingPoint);
-        film.addRating(user.getID(), ratingPoint);
-    }
-
     // checks if the film exist with given ID inside an ArrayList
     public boolean isFilmExist(Integer ID, ArrayList<Film> films){
 
@@ -313,6 +307,28 @@ public class Commands {
                 bw.write(", ");
             }
         }
+    }
+
+
+    public String getFeatureFilmData(ArrayList<Film> films){
+        int count = 0;
+        StringBuilder featureFilmDatas = new StringBuilder();
+
+        for(Film film: films){
+
+            featureFilmDatas.append("Film title: " + film.getFilmTitle() + " " + film.getDate() + "\n");
+            featureFilmDatas.append(film.getRunTime() + " min\n");
+            featureFilmDatas.append("Language: " + film.getLanguage() + "\n");
+            count++;
+            if(count < films.size()){
+                featureFilmDatas.append("\n");
+            }
+        }
+        if(count == 0){
+            featureFilmDatas.append("No result\n");
+        }
+
+        return featureFilmDatas.toString();
     }
 
 

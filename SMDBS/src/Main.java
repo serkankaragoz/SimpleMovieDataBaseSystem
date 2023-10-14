@@ -2,6 +2,9 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Main {
 
@@ -60,7 +63,7 @@ public class Main {
                 Integer filmID = Integer.valueOf(commandLine.get(2));
                 Integer ratingPoint = Integer.valueOf(commandLine.get(3));
 
-                if(ratingPoint > 10 && ratingPoint < 0){
+                if(ratingPoint > 10 || ratingPoint < 0){
                     System.out.println("Error! Rating score must be between 1 and 10 integers");
                 }
                 else{
@@ -72,7 +75,7 @@ public class Main {
                     Film film = commands.getFilmFromId(filmID,filmArray);
 
 
-                    if(person != null && film != null && person.getRatedFilms().containsKey(filmID) == false && person.getName() != null){
+                    if(person != null && film != null && !person.getRatedFilms().containsKey(filmID) && person.getName() != null){
                         ((User) person).rateFilm(film.getFilmID(),ratingPoint);
                         film.addRating(person.getID(), ratingPoint);
                         //commands.addRating(person,film,ratingPoint);
@@ -233,8 +236,8 @@ public class Main {
             }
 
             else if(commandLine.get(0).equals("REMOVE") && commandLine.get(1).equals("RATE")){
-                int userID = Integer.valueOf(commandLine.get(2));
-                int filmID = Integer.valueOf(commandLine.get(3));
+                int userID = Integer.parseInt(commandLine.get(2));
+                int filmID = Integer.parseInt(commandLine.get(3));
 
                 Person person = commands.getPersonFromId(userID,personArray);
                 Film film = commands.getFilmFromId(filmID,filmArray);
@@ -255,12 +258,7 @@ public class Main {
 
                 int count = 0;
 
-                ArrayList<Film> films = new ArrayList<>();
-                for(Film film: filmArray){
-                    if(film.getClass() == TvSeries.class){
-                        films.add(film);
-                    }
-                }
+                ArrayList<Film> films = (ArrayList<Film>) filmArray.stream().filter(film -> film.getClass() == TvSeries.class).collect(Collectors.toList());
 
                 for(Film film: films){
                         bw.write(((TvSeries)film).getFilmTitle() + " " + film.getDate() + "\n");
@@ -303,58 +301,22 @@ public class Main {
                 }
             }
 
-            else if(commandLine.get(0).equals("LIST") && commandLine.get(1).equals("FEATUREFILMS") && commandLine.get(2).equals("BEFORE")){
+            else if(commandLine.get(0).equals("LIST") && commandLine.get(1).equals("FEATUREFILMS")){
 
-                int year = Integer.valueOf(commandLine.get(3));
-                int count = 0;
+                int year = Integer.parseInt(commandLine.get(3));
+                Predicate<Film> filterPredicate = film -> false;
 
-                ArrayList<Film> films = new ArrayList<>();
-                for(Film film: filmArray){
-                    if(film.getClass() == FeatureFilm.class && Integer.valueOf(((FeatureFilm) film).getReleaseDate().substring(6)) <= year){
-                        films.add(film);
-                    }
+                switch (commandLine.get(2)) {
+                    case "BEFORE" -> filterPredicate = film -> film.getClass() == FeatureFilm.class && Integer.parseInt(((FeatureFilm) film).getReleaseDate().substring(6)) <= year;
+                    case "AFTER" -> filterPredicate = film -> film.getClass() == FeatureFilm.class && Integer.parseInt(((FeatureFilm) film).getReleaseDate().substring(6)) >= year;
                 }
-                for(Film film: films){
 
-                    bw.write("Film title: " + film.getFilmTitle() + " " + film.getDate() + "\n");
-                    bw.write(film.getRunTime() + " min\n");
-                    bw.write("Language: " + film.getLanguage() + "\n");
-                    count++;
-                    if(count < films.size()){
-                        bw.write("\n");
-                    }
+                ArrayList<Film> films = (ArrayList<Film>) filmArray.stream()
+                        .filter(filterPredicate)
+                        .collect(Collectors.toList());
 
+                bw.write(commands.getFeatureFilmData(films));
 
-                }
-                if(films.size() == 0){
-                    bw.write("No result\n");
-                }
-            }
-
-            else if(commandLine.get(0).equals("LIST") && commandLine.get(1).equals("FEATUREFILMS") && commandLine.get(2).equals("AFTER")){
-                int year = Integer.valueOf(commandLine.get(3));
-                int count = 0;
-
-                ArrayList<Film> films = new ArrayList<>();
-                for(Film film: filmArray){
-                    if(film.getClass() == FeatureFilm.class && Integer.valueOf(((FeatureFilm) film).getReleaseDate().substring(6)) >= year){
-                        films.add(film);
-                    }
-                }
-                for(Film film: films){
-
-                    bw.write("Film title: " + film.getFilmTitle() + " " + film.getDate() + "\n");
-                    bw.write(film.getRunTime() + " min\n");
-                    bw.write("Language: " + film.getLanguage() + "\n");
-                    count++;
-                    if(count < films.size()){
-                        bw.write("\n");
-                    }
-
-                }
-                if(count == 0){
-                    bw.write("No result\n");
-                }
             }
 
             else if(commandLine.get(0).equals("LIST") && commandLine.get(1).equals("FILMS") && commandLine.get(2).equals("BY") && commandLine.get(3).equals("RATE") && commandLine.get(4).equals("DEGREE")){
@@ -366,6 +328,7 @@ public class Main {
                 sampleFilms.add(new ShortFilm());
                 sampleFilms.add(new Documentary());
                 sampleFilms.add(new TvSeries());
+
 
                 for(Film film: sampleFilms){
 
