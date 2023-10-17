@@ -76,6 +76,19 @@ public class Film{
         this.performerIDs = performers;
     }
 
+    public Film(){}
+
+    public Film(String[] commandLine){
+
+
+        this.setFilmID(Integer.parseInt(commandLine[1]));
+        this.setFilmTitle(commandLine[2]);
+        this.setLanguage(commandLine[3]);
+        this.setDirectorIDs(Commands.toIntegerArrayList(commandLine[4].split(",")));
+        this.setRunTime(Integer.parseInt(commandLine[5]));
+        this.setCountry(commandLine[6]);
+        this.setPerformerIDs(Commands.toIntegerArrayList(commandLine[7].split(",")));
+    }
 
 
     // checks if this film object inside of the given array
@@ -120,7 +133,7 @@ public class Film{
     }
 
     public float getRatingPoint() {
-        if(this.getRatings().size() != 0){
+        if(!this.getRatings().isEmpty()){
             ratingPoint = sumOfRatingPoints / this.ratings.size();
             return ratingPoint;
         }

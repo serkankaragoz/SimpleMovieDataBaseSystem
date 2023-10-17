@@ -6,6 +6,17 @@ public class FeatureFilm extends Film{
     private ArrayList<Integer> writerIDs;
     private ArrayList<String> genres;
 
+    public FeatureFilm(){}
+
+    public FeatureFilm(String[] commandLine){
+        super(commandLine);
+
+        this.setGenres(Commands.toStringArrayList(commandLine[8].split(",")));
+        this.setReleaseDate(commandLine[9]);
+        this.setWriterIDs(Commands.toIntegerArrayList(commandLine[10].split(",")));
+        this.setBudget(Long.valueOf(commandLine[11]));
+    }
+
     // returns the name of class
     @Override
     public String toString() { return "FeatureFilm"; }

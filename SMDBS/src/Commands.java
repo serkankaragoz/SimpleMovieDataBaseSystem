@@ -7,7 +7,7 @@ import java.util.*;
 public class Commands {
 
     // takes a String array and converts it to Integer ArrayList
-    public ArrayList<Integer> toIntegerArrayList(String[] strings){
+    public static ArrayList<Integer> toIntegerArrayList(String[] strings){
         ArrayList<Integer> integers = new ArrayList<>();
 
         for(String string: strings){
@@ -18,101 +18,82 @@ public class Commands {
     }
 
 
-    // takes a Integer array and converts it to String ArrayList
-    public ArrayList<String> toStringArrayList(String[] strings){
-        ArrayList<String> stringArray = new ArrayList<>();
+    // takes an Integer array and converts it to String ArrayList
+    public static ArrayList<String> toStringArrayList(String[] strings){
 
-        for(String string: strings){
-            stringArray.add(string);
-        }
-        return stringArray;
+        return new ArrayList<>(Arrays.asList(strings));
 
     }
 
 
-    public ArrayList<ArrayList<String>> convertFileToStringArray(String filePath) throws IOException {
+    public String[][] convertFileToStringArray(String filePath) throws IOException {
         // this functions returns a 2d string arraylist
         // with using the datas obtained from the path file taken from the user
 
-        ArrayList<ArrayList<String>> fileContents = new ArrayList<>();
-        BufferedReader bufferedReader = new BufferedReader(new FileReader(filePath));
+        return new BufferedReader(new FileReader(filePath))
+                .lines()
+                .map(stringLine -> stringLine.split("\t"))
+                .toArray(String[][]::new);
 
-        String stringLine;
-
-        for(int i = 0;(stringLine = bufferedReader.readLine()) != null;i++){
-
-            ArrayList<String> arrayListLine = new ArrayList<>();
-
-
-            String[] line = stringLine.split("\t");
-
-            for(int j = 0;j < line.length;j++){
-                arrayListLine.add(line[j]);
-            }
-
-            fileContents.add(arrayListLine);
-
-        }
-        return fileContents;
     }
 
 
     // takes the 2d String ArrayList and converts it to Person array
-    public ArrayList<Person> StringToPersonArray(ArrayList<ArrayList<String>> peopleStringArray){
+    public ArrayList<Person> StringToPersonArray(String[][] peopleStringArray){
 
         ArrayList<Person> persons = new ArrayList<>();
         Person person;
 
         int index = 0;
-        for(ArrayList<String> peopleStringLine: peopleStringArray){
+        for(String[] peopleStringLine: peopleStringArray){
 
 
 
-            if(peopleStringLine.get(0).equals("Director:")){
+            if(peopleStringLine[0].equals("Director:")){
 
                 persons.add(new Director());
-                ((Director) persons.get(index)).setAgent(peopleStringLine.get(5));
+                ((Director) persons.get(index)).setAgent(peopleStringLine[5]);
             }
 
-            if(peopleStringLine.get(0).equals("Writer:")){
+            if(peopleStringLine[0].equals("Writer:")){
 
                 persons.add(new Writer());
-                ((Writer) persons.get(index)).setWritingStyle(peopleStringLine.get(5));
+                ((Writer) persons.get(index)).setWritingStyle(peopleStringLine[5]);
             }
 
-            if(peopleStringLine.get(0).equals("Actor:")){
+            if(peopleStringLine[0].equals("Actor:")){
 
                 persons.add(new Actor());
-                ((Actor) persons.get(index)).setHeight(Integer.valueOf(peopleStringLine.get(5)));
+                ((Actor) persons.get(index)).setHeight(Integer.valueOf(peopleStringLine[5]));
             }
 
-            if(peopleStringLine.get(0).equals("ChildActor:")){
+            if(peopleStringLine[0].equals("ChildActor:")){
 
                 persons.add(new ChildActor());
-                ((ChildActor) persons.get(index)).setAge(Integer.valueOf(peopleStringLine.get(5)));
+                ((ChildActor) persons.get(index)).setAge(Integer.parseInt(peopleStringLine[5]));
             }
 
-            if(peopleStringLine.get(0).equals("StuntPerformer:")){
+            if(peopleStringLine[0].equals("StuntPerformer:")){
 
                 persons.add(new StuntPerformer());
-                ((StuntPerformer) persons.get(index)).setHeight(Integer.valueOf(peopleStringLine.get(5)));
+                ((StuntPerformer) persons.get(index)).setHeight(Integer.parseInt(peopleStringLine[5]));
 
-                String[] IDs = peopleStringLine.get(6).split(",");
+                String[] IDs = peopleStringLine[6].split(",");
                 ((StuntPerformer) persons.get(index)).setActorIDs(new ArrayList<>());
 
                 for(int i = 0;i < IDs.length;i++){
-                    ((StuntPerformer) persons.get(index)).addActorIDs(Integer.valueOf(IDs[i]));
+                    ((StuntPerformer) persons.get(index)).addActorIDs(Integer.parseInt(IDs[i]));
                 }
 
             }
-            if(peopleStringLine.get(0).equals("User:")){
+            if(peopleStringLine[0].equals("User:")){
                 persons.add(new User());
             }
 
-            persons.get(index).setID(Integer.valueOf(peopleStringLine.get(1)));
-            persons.get(index).setName(peopleStringLine.get(2));
-            persons.get(index).setSurname(peopleStringLine.get(3));
-            persons.get(index).setCountry(peopleStringLine.get(4));
+            persons.get(index).setID(Integer.valueOf(peopleStringLine[1]));
+            persons.get(index).setName(peopleStringLine[2]);
+            persons.get(index).setSurname(peopleStringLine[3]);
+            persons.get(index).setCountry(peopleStringLine[4]);
 
 
 
@@ -124,84 +105,53 @@ public class Commands {
 
 
     // takes a String ArrayList and converts it to Film object
-    public Film toFilm(String filmType, ArrayList<String> filmStringLine){
+    public Film toFilm(String filmType, String[] filmStringLine){
 
-        Film film = new Film();
-        //int index = films.size();
-        int index = 0;
-
-        if(filmType.equals("FeatureFilm:")){
-
-            film = new FeatureFilm();
-
-            ((FeatureFilm) film).setGenres(toStringArrayList(filmStringLine.get(8).split(",")));
-            ((FeatureFilm) film).setReleaseDate(filmStringLine.get(9));
-            ((FeatureFilm) film).setWriterIDs(toIntegerArrayList(filmStringLine.get(10).split(",")));
-            ((FeatureFilm) film).setBudget(Long.valueOf(filmStringLine.get(11)));
-
+        if(filmType.equals("ShortFilm") && Integer.parseInt(filmStringLine[5]) > 40){
+            System.out.println("Error! A short film can't be longer than 40 minutes");
+            return null;
         }
 
-        else if(filmType.equals("ShortFilm:")){
+        /*
+        try {
+            Class c = Class.forName(filmType);
+            c.cast()
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        */
 
-            film = new ShortFilm();
-
-            if(Integer.valueOf(filmStringLine.get(5)) > 40){
-                System.out.println("Error! A short film can't be longer than 40 minutes");
-                return null;
+        switch (filmType){
+            case "FeatureFilm":{
+                return new FeatureFilm(filmStringLine);
             }
-
-            ((ShortFilm) film).setGenres(toStringArrayList(filmStringLine.get(8).split(",")));
-            ((ShortFilm) film).setReleaseDate(filmStringLine.get(9));
-            ((ShortFilm) film).setWriterIDs(toIntegerArrayList(filmStringLine.get(10).split(",")));
-
+            case "ShortFilm":{
+                return new ShortFilm(filmStringLine);
+            }
+            case "Documentary":{
+                return new Documentary(filmStringLine);
+            }
+            case "TVSeries":{
+                return new TVSeries(filmStringLine);
+            }
         }
 
-        else if(filmType.equals("Documentary:")){
-
-            film =  new Documentary();
-
-            ((Documentary) film).setReleaseDate(filmStringLine.get(8));
-
-        }
-
-        else if(filmType.equals("TVSeries:")){
-
-            film = new TvSeries();
-
-            ((TvSeries) film).setGenres(toStringArrayList(filmStringLine.get(8).split(",")));
-            ((TvSeries) film).setWriterIDs(toIntegerArrayList(filmStringLine.get(9).split(",")));
-            ((TvSeries) film).setStartDate(filmStringLine.get(10));
-            ((TvSeries) film).setEndDate(filmStringLine.get(11));
-            ((TvSeries) film).setNumberOfSeasons(Integer.valueOf(filmStringLine.get(12)));
-            ((TvSeries) film).setNumberOfEpisodes(Integer.valueOf(filmStringLine.get(13)));
-
-        }
-
-
-        film.setFilmID(Integer.valueOf(filmStringLine.get(1)));
-        film.setFilmTitle(filmStringLine.get(2));
-        film.setLanguage(filmStringLine.get(3));
-        film.setDirectorIDs(toIntegerArrayList(filmStringLine.get(4).split(",")));
-        film.setRunTime(Integer.valueOf(filmStringLine.get(5)));
-        film.setCountry(filmStringLine.get(6));
-        film.setPerformerIDs(toIntegerArrayList(filmStringLine.get(7).split(",")));
-
-
-
-
-        return film;
+        return new Film(filmStringLine);
     }
 
     // takes a 2d String ArrayList and converts it to Film ArrayList
-    public ArrayList<Film> StringToFilmArray(ArrayList<ArrayList<String>> filmStringArray) {
+    public ArrayList<Film> StringToFilmArray(String[][] filmStringArray) {
 
 
         ArrayList<Film> films = new ArrayList<>();
         Film film;
         int index = 0;
 
-        for (ArrayList<String> filmStringLine : filmStringArray) {
-               films.add(toFilm(filmStringLine.get(0),filmStringLine));
+        String filmType;
+
+        for (String[] filmStringLine : filmStringArray) {
+            filmType = filmStringLine[0].substring(0, filmStringLine[0].length()-1);
+            films.add(toFilm(filmType,filmStringLine));
         }
 
         return films;

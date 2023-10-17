@@ -6,6 +6,17 @@ public class ShortFilm extends Film{
     private ArrayList<Integer> writerIDs;
     private ArrayList<String> genres;
 
+    public ShortFilm(){}
+
+    public ShortFilm(String[] commandLine){
+        super(commandLine);
+
+        this.setGenres(Commands.toStringArrayList(commandLine[8].split(",")));
+        this.setReleaseDate(commandLine[9]);
+        this.setWriterIDs(Commands.toIntegerArrayList(commandLine[10].split(",")));
+    }
+
+
     // returns the name of class
     @Override
     public String toString() { return "ShortFilm"; }

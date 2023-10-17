@@ -1,12 +1,26 @@
 import java.util.ArrayList;
 
-public class TvSeries extends Film{
+public class TVSeries extends Film{
     private String startDate;
     private String endDate;
     private int numberOfSeasons;
     private int numberOfEpisodes;
     private ArrayList<String> genres;
     private ArrayList<Integer> writerIDs;
+
+
+    public TVSeries(){}
+
+    public TVSeries(String[] commandLine){
+        super(commandLine);
+
+        this.setGenres(Commands.toStringArrayList(commandLine[8].split(",")));
+        this.setWriterIDs(Commands.toIntegerArrayList(commandLine[9].split(",")));
+        this.setStartDate(commandLine[10]);
+        this.setEndDate(commandLine[11]);
+        this.setNumberOfSeasons(Integer.parseInt(commandLine[12]));
+        this.setNumberOfEpisodes(Integer.parseInt(commandLine[13]));
+    }
 
     @Override
     public String toString() { return "TVSeries"; }

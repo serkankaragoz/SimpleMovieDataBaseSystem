@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Main {
 
@@ -30,13 +29,13 @@ public class Main {
         String outputFilePath = "output.txt";
 
 
-        ArrayList<ArrayList<String>> peopleStringArray = commands.convertFileToStringArray(peopleFilePath);
+        String[][] peopleStringArray = commands.convertFileToStringArray(peopleFilePath);
         ArrayList<Person> personArray = commands.StringToPersonArray(peopleStringArray);
 
-        ArrayList<ArrayList<String>> filmStringArray = commands.convertFileToStringArray(filmFilePath);
+        String[][] filmStringArray = commands.convertFileToStringArray(filmFilePath);
         ArrayList<Film> filmArray = commands.StringToFilmArray(filmStringArray);
 
-        ArrayList<ArrayList<String>> commandsArray = commands.convertFileToStringArray(commandsFilePath);
+        String[][] commandsArray = commands.convertFileToStringArray(commandsFilePath);
 
 
         BufferedWriter bw = new BufferedWriter(new FileWriter(outputFilePath, false));
@@ -45,7 +44,7 @@ public class Main {
 
 
         // applies the commands line by line
-        for(ArrayList<String> commandLine: commandsArray){
+        for(String[] commandLine: commandsArray){
 
             // We constructed this BufferedWriter on every beginning of the loop instead of constructing only once. Because somehow if
             // an error occurs, any of the outputs can't be written to output file
@@ -58,10 +57,10 @@ public class Main {
             bw.write("\n\n");
 
 
-            if(commandLine.get(0).equals("RATE")){
-                Integer personID = Integer.valueOf(commandLine.get(1));
-                Integer filmID = Integer.valueOf(commandLine.get(2));
-                Integer ratingPoint = Integer.valueOf(commandLine.get(3));
+            if(commandLine[0].equals("RATE")){
+                Integer personID = Integer.valueOf(commandLine[1]);
+                Integer filmID = Integer.valueOf(commandLine[2]);
+                Integer ratingPoint = Integer.valueOf(commandLine[3]);
 
                 if(ratingPoint > 10 || ratingPoint < 0){
                     System.out.println("Error! Rating score must be between 1 and 10 integers");
@@ -98,22 +97,25 @@ public class Main {
 
             }
 
-            else if(commandLine.get(0).equals("ADD") && commandLine.get(1).equals("FEATUREFILM")){
+            else if(commandLine[0].equals("ADD") && commandLine[1].equals("FEATUREFILM")){
 
 
-                ArrayList<String> newLine = new ArrayList<>(commandLine);
-                newLine.remove(0);
+                ArrayList<String> temp = (ArrayList<String>) Arrays.asList(commandLine);
+                temp.remove(0);
+                temp.set(0,"FeatureFilm:");
+                String[] newLine = temp.toArray(new String[0]); // TODO improve performance since theres a redundant string array initialization extra
 
-                newLine.set(0,"FeatureFilm:");
-                Film film = commands.toFilm("FeatureFilm:",newLine);
+
+
+                Film film = commands.toFilm("FeatureFilm",newLine);
 
                 Director directorr = new Director();
                 Performer performerr = new Performer();
                 Writer writerr = new Writer();
 
-                if(!(film.isFilmExist(filmArray)) && commands.isEveryoneExist(directorr,newLine.get(4),personArray)
-                        && commands.isEveryoneExist(performerr,newLine.get(7),personArray)
-                        && commands.isEveryoneExist(writerr,newLine.get(10),personArray)){
+                if(!(film.isFilmExist(filmArray)) && commands.isEveryoneExist(directorr,newLine[4],personArray)
+                        && commands.isEveryoneExist(performerr,newLine[7],personArray)
+                        && commands.isEveryoneExist(writerr,newLine[10],personArray)){
 
                     filmArray.add(film);
                     bw.write("FeatureFilm added successfully");
@@ -128,9 +130,9 @@ public class Main {
 
             }
 
-            else if(commandLine.get(0).equals("VIEWFILM")){
-                if(commands.isFilmExist(Integer.valueOf(commandLine.get(1)),filmArray)){
-                    Film film = commands.getFilmFromId(Integer.valueOf(commandLine.get(1)),filmArray);
+            else if(commandLine[0].equals("VIEWFILM")){
+                if(commands.isFilmExist(Integer.valueOf(commandLine[1]),filmArray)){
+                    Film film = commands.getFilmFromId(Integer.valueOf(commandLine[1]),filmArray);
 
 
                     if(film.getClass() == FeatureFilm.class){
@@ -158,12 +160,12 @@ public class Main {
                     else if(film.getClass() == Documentary.class){
                         bw.write(film.getFilmTitle() + " " + film.getDate() + "\n\n");
                     }
-                    else if(film.getClass() == TvSeries.class){
+                    else if(film.getClass() == TVSeries.class){
                         bw.write(film.getFilmTitle() + " " + film.getDate() + "\n");
-                        bw.write(((TvSeries) film).getNumberOfSeasons() + " seasons, " + ((TvSeries) film).getNumberOfEpisodes() + " episodes\n");
-                        commands.printArrayListWithComma(((TvSeries) film).getGenres(),bw);
+                        bw.write(((TVSeries) film).getNumberOfSeasons() + " seasons, " + ((TVSeries) film).getNumberOfEpisodes() + " episodes\n");
+                        commands.printArrayListWithComma(((TVSeries) film).getGenres(),bw);
                         bw.write( "\nWriters: ");
-                        commands.printPersonNames(((TvSeries) film).getWriterIDs(),personArray,bw);
+                        commands.printPersonNames(((TVSeries) film).getWriterIDs(),personArray,bw);
                     }
 
                     bw.write("Directors: ");
@@ -172,7 +174,7 @@ public class Main {
                     bw.write("Stars: ");
                     commands.printPersonNames(film.getPerformerIDs(),personArray,bw);
 
-                    if(film.getRatings().size() != 0){
+                    if(!film.getRatings().isEmpty()){
                         bw.write( "Ratings: " + film.printRating() + "/10 from " + film.getRatings().size() +" users");
 
                     }
@@ -186,13 +188,13 @@ public class Main {
 
 
             }
-            else if(commandLine.get(0).equals("LIST") && commandLine.get(1).equals("USER") && commandLine.get(3).equals("RATES")){
-                int userID = Integer.parseInt(commandLine.get(2));
+            else if(commandLine[0].equals("LIST") && commandLine[1].equals("USER") && commandLine[3].equals("RATES")){
+                int userID = Integer.parseInt(commandLine[2]);
 
                 if(commands.getPersonFromId(userID,personArray).getClass() == User.class){
 
                     User user = (User) commands.getPersonFromId(userID,personArray);
-                    if(user.getRatedFilms().size() != 0){
+                    if(!user.getRatedFilms().isEmpty()){
                         for(Integer ratedFilmID: user.getRatedFilms().keySet()){
                             Film film = commands.getFilmFromId(ratedFilmID, filmArray);
                             bw.write(film.getFilmTitle() + ": " + film.getRatings().get(userID) +"\n");
@@ -210,10 +212,10 @@ public class Main {
 
             }
 
-            else if(commandLine.get(0).equals("EDIT") && commandLine.get(1).equals("RATE")){
-                int userID = Integer.parseInt(commandLine.get(2));
-                int filmID = Integer.parseInt(commandLine.get(3));
-                int newRatingPoint = Integer.parseInt(commandLine.get(4));
+            else if(commandLine[0].equals("EDIT") && commandLine[1].equals("RATE")){
+                int userID = Integer.parseInt(commandLine[2]);
+                int filmID = Integer.parseInt(commandLine[3]);
+                int newRatingPoint = Integer.parseInt(commandLine[4]);
 
                 User user = (User) commands.getPersonFromId(userID,personArray);
                 Film film = commands.getFilmFromId(filmID,filmArray);
@@ -232,9 +234,9 @@ public class Main {
                 }
             }
 
-            else if(commandLine.get(0).equals("REMOVE") && commandLine.get(1).equals("RATE")){
-                int userID = Integer.parseInt(commandLine.get(2));
-                int filmID = Integer.parseInt(commandLine.get(3));
+            else if(commandLine[0].equals("REMOVE") && commandLine[1].equals("RATE")){
+                int userID = Integer.parseInt(commandLine[2]);
+                int filmID = Integer.parseInt(commandLine[3]);
 
                 User user = (User) commands.getPersonFromId(userID,personArray);
                 Film film = commands.getFilmFromId(filmID,filmArray);
@@ -251,15 +253,15 @@ public class Main {
                 }
 
             }
-            else if(commandLine.get(0).equals("LIST") && commandLine.get(1).equals("FILM") && commandLine.get(2).equals("SERIES")){
+            else if(commandLine[0].equals("LIST") && commandLine[1].equals("FILM") && commandLine[2].equals("SERIES")){
 
                 int count = 0;
 
-                ArrayList<Film> films = (ArrayList<Film>) filmArray.stream().filter(film -> film.getClass() == TvSeries.class).collect(Collectors.toList());
+                ArrayList<Film> films = (ArrayList<Film>) filmArray.stream().filter(film -> film.getClass() == TVSeries.class).collect(Collectors.toList());
 
                 for(Film film: films){
-                        bw.write(((TvSeries)film).getFilmTitle() + " " + film.getDate() + "\n");
-                        bw.write(((TvSeries) film).getNumberOfSeasons() + " seasons and " + ((TvSeries) film).getNumberOfEpisodes() + " episodes\n");
+                        bw.write(((TVSeries)film).getFilmTitle() + " " + film.getDate() + "\n");
+                        bw.write(((TVSeries) film).getNumberOfSeasons() + " seasons and " + ((TVSeries) film).getNumberOfEpisodes() + " episodes\n");
                         count++;
 
                     if(count < films.size()){
@@ -272,8 +274,8 @@ public class Main {
                 }
             }
 
-            else if(commandLine.get(0).equals("LIST") && commandLine.get(1).equals("FILMS") && commandLine.get(2).equals("BY") && commandLine.get(3).equals("COUNTRY")){
-                String countryName = String.valueOf(commandLine.get(4));
+            else if(commandLine[0].equals("LIST") && commandLine[1].equals("FILMS") && commandLine[2].equals("BY") && commandLine[3].equals("COUNTRY")){
+                String countryName = String.valueOf(commandLine[4]);
 
 
                 ArrayList<Film> films = new ArrayList<>();
@@ -298,14 +300,20 @@ public class Main {
                 }
             }
 
-            else if(commandLine.get(0).equals("LIST") && commandLine.get(1).equals("FEATUREFILMS")){
+            else if(commandLine[0].equals("LIST") && commandLine[1].equals("FEATUREFILMS")){
 
-                int year = Integer.parseInt(commandLine.get(3));
+                int year = Integer.parseInt(commandLine[3]);
                 Predicate<Film> filterPredicate = film -> false;
 
-                switch (commandLine.get(2)) {
-                    case "BEFORE" -> filterPredicate = film -> film.getClass() == FeatureFilm.class && Integer.parseInt(((FeatureFilm) film).getReleaseDate().substring(6)) <= year;
-                    case "AFTER" -> filterPredicate = film -> film.getClass() == FeatureFilm.class && Integer.parseInt(((FeatureFilm) film).getReleaseDate().substring(6)) >= year;
+                switch (commandLine[2]) {
+                    case "BEFORE": {
+                        filterPredicate = film -> film.getClass() == FeatureFilm.class && Integer.parseInt(((FeatureFilm) film).getReleaseDate().substring(6)) <= year;
+                        break;
+                    }
+                        case "AFTER": {
+                        filterPredicate = film -> film.getClass() == FeatureFilm.class && Integer.parseInt(((FeatureFilm) film).getReleaseDate().substring(6)) >= year;
+                        break;
+                    }
                 }
 
                 ArrayList<Film> films = (ArrayList<Film>) filmArray.stream()
@@ -316,7 +324,7 @@ public class Main {
 
             }
 
-            else if(commandLine.get(0).equals("LIST") && commandLine.get(1).equals("FILMS") && commandLine.get(2).equals("BY") && commandLine.get(3).equals("RATE") && commandLine.get(4).equals("DEGREE")){
+            else if(commandLine[0].equals("LIST") && commandLine[1].equals("FILMS") && commandLine[2].equals("BY") && commandLine[3].equals("RATE") && commandLine[4].equals("DEGREE")){
                 ArrayList<Film> sampleFilms = new ArrayList<>();
 
                 int i = 0;
@@ -324,7 +332,7 @@ public class Main {
                 sampleFilms.add(new FeatureFilm());
                 sampleFilms.add(new ShortFilm());
                 sampleFilms.add(new Documentary());
-                sampleFilms.add(new TvSeries());
+                sampleFilms.add(new TVSeries());
 
 
                 for(Film film: sampleFilms){
@@ -351,8 +359,8 @@ public class Main {
 
             }
 
-            else if(commandLine.get(0).equals("LIST") && commandLine.get(1).equals("ARTISTS") && commandLine.get(2).equals("FROM")){
-                String country = commandLine.get(3);
+            else if(commandLine[0].equals("LIST") && commandLine[1].equals("ARTISTS") && commandLine[2].equals("FROM")){
+                String country = commandLine[3];
 
                 ArrayList<ArrayList<Artist>> artists = new ArrayList<>();
                 for(int i = 0;i < 5;i++){

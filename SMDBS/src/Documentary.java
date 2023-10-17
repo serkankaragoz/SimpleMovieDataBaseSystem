@@ -1,6 +1,15 @@
 public class Documentary extends Film{
     private String releaseDate;
 
+    public Documentary(){}
+
+    public Documentary(String[] commandLine){
+        super(commandLine);
+
+        this.setReleaseDate(commandLine[8]);
+    }
+
+
     // returns the name of class
     @Override
     public String toString() { return "Documentary"; }
