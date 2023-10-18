@@ -107,13 +107,13 @@ public class Main {
 
 
 
-                Film film = commands.toFilm("FeatureFilm",newLine);
+                Film film = commands.toFilm(newLine);
 
                 Director directorr = new Director();
                 Performer performerr = new Performer();
                 Writer writerr = new Writer();
 
-                if(!(film.isFilmExist(filmArray)) && commands.isEveryoneExist(directorr,newLine[4],personArray)
+                if(!(filmArray.contains(film)) && commands.isEveryoneExist(directorr,newLine[4],personArray)
                         && commands.isEveryoneExist(performerr,newLine[7],personArray)
                         && commands.isEveryoneExist(writerr,newLine[10],personArray)){
 
@@ -260,7 +260,7 @@ public class Main {
                 ArrayList<Film> films = (ArrayList<Film>) filmArray.stream().filter(film -> film.getClass() == TVSeries.class).collect(Collectors.toList());
 
                 for(Film film: films){
-                        bw.write(((TVSeries)film).getFilmTitle() + " " + film.getDate() + "\n");
+                        bw.write(film.getFilmTitle() + " " + film.getDate() + "\n");
                         bw.write(((TVSeries) film).getNumberOfSeasons() + " seasons and " + ((TVSeries) film).getNumberOfEpisodes() + " episodes\n");
                         count++;
 
@@ -337,7 +337,7 @@ public class Main {
 
                 for(Film film: sampleFilms){
 
-                    ArrayList<Film> films = commands.extractFilm(film,filmArray);
+                    ArrayList<Film> films = (ArrayList<Film>) filmArray.stream().filter(it -> it.getClass().equals(film.getClass())).collect(Collectors.toList());
 
                     films.sort(Commands.rateDegreeComparator);
 
@@ -386,7 +386,7 @@ public class Main {
                     else if(i == 3){ bw.write("\nChildActors:\n"); }
                     else if(i == 4){ bw.write("\nStuntPerformers:\n"); }
 
-                    if(artists.get(i).size() == 0){
+                    if(artists.get(i).isEmpty()){
                         bw.write("No result\n");
                     }
                     else{

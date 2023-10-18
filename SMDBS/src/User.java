@@ -6,6 +6,12 @@ public class User extends Person{
 
 
 
+    public User(){}
+
+    public User(String[] peopleStringLine){
+        super(peopleStringLine);
+    }
+
     public HashMap<Integer, Integer> getRatedFilms() {
         return ratedFilms;
     }
@@ -16,12 +22,9 @@ public class User extends Person{
 
     // rates the given film
     public void rateFilm(Integer filmID, Integer ratingPoint){
-        if(this.ratedFilms.containsKey(filmID) == false){
+        if(!this.ratedFilms.containsKey(filmID)){
             ratedFilms.put(filmID, ratingPoint);
         }
-
-
-
     }
 
 

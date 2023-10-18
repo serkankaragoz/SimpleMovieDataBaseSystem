@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.*;
 
 public class Commands {
@@ -20,9 +21,7 @@ public class Commands {
 
     // takes an Integer array and converts it to String ArrayList
     public static ArrayList<String> toStringArrayList(String[] strings){
-
         return new ArrayList<>(Arrays.asList(strings));
-
     }
 
 
@@ -42,70 +41,37 @@ public class Commands {
     public ArrayList<Person> StringToPersonArray(String[][] peopleStringArray){
 
         ArrayList<Person> persons = new ArrayList<>();
-        Person person;
 
-        int index = 0;
-        for(String[] peopleStringLine: peopleStringArray){
+        Arrays.stream(peopleStringArray)
+                .map(peopleStringLine -> { persons.add(toPerson(peopleStringLine)); return true; });
 
-
-
-            if(peopleStringLine[0].equals("Director:")){
-
-                persons.add(new Director());
-                ((Director) persons.get(index)).setAgent(peopleStringLine[5]);
-            }
-
-            if(peopleStringLine[0].equals("Writer:")){
-
-                persons.add(new Writer());
-                ((Writer) persons.get(index)).setWritingStyle(peopleStringLine[5]);
-            }
-
-            if(peopleStringLine[0].equals("Actor:")){
-
-                persons.add(new Actor());
-                ((Actor) persons.get(index)).setHeight(Integer.valueOf(peopleStringLine[5]));
-            }
-
-            if(peopleStringLine[0].equals("ChildActor:")){
-
-                persons.add(new ChildActor());
-                ((ChildActor) persons.get(index)).setAge(Integer.parseInt(peopleStringLine[5]));
-            }
-
-            if(peopleStringLine[0].equals("StuntPerformer:")){
-
-                persons.add(new StuntPerformer());
-                ((StuntPerformer) persons.get(index)).setHeight(Integer.parseInt(peopleStringLine[5]));
-
-                String[] IDs = peopleStringLine[6].split(",");
-                ((StuntPerformer) persons.get(index)).setActorIDs(new ArrayList<>());
-
-                for(int i = 0;i < IDs.length;i++){
-                    ((StuntPerformer) persons.get(index)).addActorIDs(Integer.parseInt(IDs[i]));
-                }
-
-            }
-            if(peopleStringLine[0].equals("User:")){
-                persons.add(new User());
-            }
-
-            persons.get(index).setID(Integer.valueOf(peopleStringLine[1]));
-            persons.get(index).setName(peopleStringLine[2]);
-            persons.get(index).setSurname(peopleStringLine[3]);
-            persons.get(index).setCountry(peopleStringLine[4]);
-
-
-
-            index++;
-        }
+//        for(String[] peopleStringLine: peopleStringArray){
+//            persons.add(toPerson(peopleStringLine));
+//        }
 
         return persons;
     }
 
 
+    public Person toPerson(String[] peopleStringLine){
+
+        String userType = peopleStringLine[0].substring(0, peopleStringLine[0].length()-1);
+
+        switch (userType){
+            case "Director":{ return new Person(peopleStringLine);}
+            case "Writer":{ return new Writer(peopleStringLine);}
+            case "Actor":{ return new Actor(peopleStringLine);}
+            case "ChildActor":{ return new ChildActor(peopleStringLine);}
+            case "StuntPerformer":{ return new StuntPerformer(peopleStringLine);}
+            case "User":{ return new User(peopleStringLine);}
+            default: {return null;}
+        }
+    }
+
     // takes a String ArrayList and converts it to Film object
-    public Film toFilm(String filmType, String[] filmStringLine){
+    public Film toFilm(String[] filmStringLine){
+
+        String filmType = filmStringLine[0].substring(0, filmStringLine[0].length()-1);
 
         if(filmType.equals("ShortFilm") && Integer.parseInt(filmStringLine[5]) > 40){
             System.out.println("Error! A short film can't be longer than 40 minutes");
@@ -122,18 +88,10 @@ public class Commands {
         */
 
         switch (filmType){
-            case "FeatureFilm":{
-                return new FeatureFilm(filmStringLine);
-            }
-            case "ShortFilm":{
-                return new ShortFilm(filmStringLine);
-            }
-            case "Documentary":{
-                return new Documentary(filmStringLine);
-            }
-            case "TVSeries":{
-                return new TVSeries(filmStringLine);
-            }
+            case "FeatureFilm":{ return new FeatureFilm(filmStringLine); }
+            case "ShortFilm":{ return new ShortFilm(filmStringLine); }
+            case "Documentary":{ return new Documentary(filmStringLine); }
+            case "TVSeries":{ return new TVSeries(filmStringLine); }
         }
 
         return new Film(filmStringLine);
@@ -142,16 +100,12 @@ public class Commands {
     // takes a 2d String ArrayList and converts it to Film ArrayList
     public ArrayList<Film> StringToFilmArray(String[][] filmStringArray) {
 
-
         ArrayList<Film> films = new ArrayList<>();
-        Film film;
-        int index = 0;
 
         String filmType;
 
         for (String[] filmStringLine : filmStringArray) {
-            filmType = filmStringLine[0].substring(0, filmStringLine[0].length()-1);
-            films.add(toFilm(filmType,filmStringLine));
+            films.add(toFilm(filmStringLine));
         }
 
         return films;
@@ -218,17 +172,6 @@ public class Commands {
     };
 
 
-    // Takes a Film ArrayList and returns another Film ArrayList which only contains the films that on specified class
-    public ArrayList<Film> extractFilm(Film sampleFilm,ArrayList<Film> filmArray){
-        ArrayList<Film> newFilms = new ArrayList<>();
-
-        for(Film film: filmArray){
-            if(film.getClass().equals(sampleFilm.getClass())){
-                newFilms.add(film);
-            }
-        }
-        return newFilms;
-    }
 
     // takes an Integer ArrayList, Person ArrayList, creates a Person ArrayList with givenID, writes the person names and surnames to specified file
     public void printPersonNames(ArrayList<Integer> personIDs, ArrayList<Person> personArray, BufferedWriter bw) throws IOException {

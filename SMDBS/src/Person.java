@@ -8,6 +8,15 @@ public class Person {
     private String country;
 
 
+    public Person(){}
+
+    public Person(String[] peopleStringLine){
+        this.setID(Integer.parseInt(peopleStringLine[1]));
+        this.setName(peopleStringLine[2]);
+        this.setSurname(peopleStringLine[3]);
+        this.setCountry(peopleStringLine[4]);
+    }
+
 
 
     // getters ans setters

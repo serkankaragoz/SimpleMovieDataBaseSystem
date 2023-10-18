@@ -79,8 +79,6 @@ public class Film{
     public Film(){}
 
     public Film(String[] commandLine){
-
-
         this.setFilmID(Integer.parseInt(commandLine[1]));
         this.setFilmTitle(commandLine[2]);
         this.setLanguage(commandLine[3]);
@@ -91,8 +89,18 @@ public class Film{
     }
 
 
+    @Override
+    public boolean equals(Object obj) {
+        if(super.equals(obj)) return true;
+        if(obj instanceof Film){
+            return ((Film) obj).filmID == this.filmID;
+        }
+        return false;
+    }
+
     // checks if this film object inside of the given array
     public boolean isFilmExist(ArrayList<Film> films){
+        //return films.contains(this);
 
         for(Film film: films){
             if(film.getFilmID() == this.getFilmID()) {
@@ -150,9 +158,9 @@ public class Film{
         if(point.endsWith("0")){
             return String.format("%.1g", this.getRatingPoint());
         }
-        else{
-            return point;
-        }
+
+        return point;
+
 
     }
 
